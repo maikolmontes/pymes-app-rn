@@ -1,99 +1,114 @@
-# The Pymes Manager
 
-**The Pymes Manager** es una aplicación móvil desarrollada con **React Native (Expo)** y **Firebase**, orientada a fortalecer a los micronegocios de **San Juan de Pasto** mediante herramientas de digitalización como:
+# The Pymes Manager - React Native App
 
-- **Geolocalización de negocios**
-- **Registro de microempresas**
-- **Inicio de sesión y registro de usuarios**
-- **Interfaz amigable e intuitiva**
+Aplicación móvil desarrollada con **React Native** y **Expo**, orientada a fortalecer las MiPymes en San Juan de Pasto mediante funcionalidades como geolocalización, marketing digital, facturación automática y soporte técnico.
 
-## Tecnologías utilizadas
+---
 
-- React Native (Expo)
-- Firebase Authentication
-- Firebase Firestore
-- Expo Location
-- React Navigation
-
-## Instalación y ejecución
-
-### 1. Clona el repositorio
+## 🚀 Clonar el repositorio
 
 ```bash
 git clone https://github.com/maikolmontes/pymes-app-rn.git
 cd pymes-app-rn
+```
 
-## 2. Instalar Node.js y npm
-Para poder ejecutar el proyecto, necesitas tener Node.js y npm instalados en tu sistema. Sigue estos pasos:
+---
 
-###Instalar Node.js:
+## 📦 1. Instalar Node.js y npm
 
-###Dirígete a nodejs.org y descarga la versión recomendada de Node.js. La instalación de Node.js incluirá npm (gestor de paquetes de Node).
+Antes de iniciar, asegúrate de tener [Node.js](https://nodejs.org/) instalado. Esto también instalará `npm` (gestor de paquetes de Node.js).
 
-###Para verificar que Node.js está instalado correctamente, puedes usar los siguientes comandos:
+### Verificar instalación:
 
 ```bash
 node --version
 npm --version
-Asegúrate de tener las versiones correctas de Node.js y npm.
+```
 
-##3. Instalar dependencias del proyecto
-##Una vez que tengas Node.js y npm instalados, instala las dependencias del proyecto con el siguiente comando:
+> Asegúrate de tener versiones actualizadas de Node.js y npm para evitar errores de compatibilidad.
+
+---
+
+## 📂 2. Instalar dependencias del proyecto
 
 ```bash
-Editar
 npm install
+```
 
-##Este comando instalará todas las dependencias necesarias, incluyendo Expo y otras bibliotecas que utiliza el proyecto.
+Este comando instalará todas las dependencias necesarias del proyecto, incluyendo Expo y otras bibliotecas utilizadas.
 
-##4. Instalar Expo CLI (opcional)
-##Si no tienes instalado Expo globalmente, puedes instalarlo con el siguiente comando:
+---
+
+## 📱 3. Instalar Expo CLI (opcional)
+
+Puedes instalar Expo CLI globalmente si aún no lo tienes:
 
 ```bash
 npm install -g expo
+```
 
-##Aunque no es estrictamente necesario tener Expo instalado globalmente, puedes usar este comando si prefieres trabajar con el CLI global de Expo.
+> Este paso es opcional. También puedes usar `npx expo` sin instalar Expo globalmente.
 
-##5. Iniciar la aplicación
-##Para ejecutar la aplicación en tu entorno local, usa el siguiente comando:
+---
+
+## ▶️ 4. Iniciar la aplicación
 
 ```bash
 npx expo start
+```
 
-##Este comando iniciará el servidor de desarrollo de Expo. Al ejecutarlo, se abrirá una página en tu navegador con un código QR que puedes escanear con la aplicación Expo Go en tu dispositivo móvil para ver la aplicación en acción.
+Esto abrirá el servidor de desarrollo de Expo y mostrará un código QR en tu navegador. Escanéalo con la app **Expo Go** en tu dispositivo móvil para probar la aplicación.
 
-##6. Ejecutar en un dispositivo Android o iOS
-##Para ejecutar en Android, conecta tu dispositivo o usa un emulador y corre:
+---
+
+## 📱 5. Ejecutar en Android o iOS
+
+### Android
+
+Conecta tu dispositivo Android o usa un emulador:
 
 ```bash
 npm run android
-##Para ejecutar en iOS, si tienes una Mac con Xcode, puedes usar:
+```
+
+### iOS
+
+En Mac con Xcode instalado:
 
 ```bash
 npm run ios
+```
 
-##Notas adicionales
-##Si tienes problemas con la versión global de Expo CLI, puedes desinstalarlo con:
+---
+
+## ⚙️ Notas adicionales
+
+- Si tienes problemas con la versión global de Expo CLI:
 
 ```bash
-
 npm uninstall -g expo-cli
-##Si prefieres usar Yarn en lugar de npm, puedes instalarlo globalmente con:
+```
+
+- Si prefieres usar Yarn en lugar de npm:
 
 ```bash
 npm install -g yarn
-
-##Y luego usar:
-
-```bash
 yarn install
+```
 
-##Verificar instalación:
-##Después de instalar Node.js y npm, verifica que estén correctamente instalados ejecutando los siguientes comandos en tu terminal o consola:
+---
+
+## ✅ Verificación final
+
+Asegúrate de que Node.js y npm están correctamente instalados:
 
 ```bash
 node --version
 npm --version
+```
 
-##¡Listo! Ahora puedes empezar a trabajar con The Pymes Manager en tu máquina local.
+---
 
+## 🧠 ¡Todo listo!
+
+Ya puedes comenzar a trabajar con **The Pymes Manager** en tu máquina local.
