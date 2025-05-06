@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Modal, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Location from 'expo-location';
 
 export default function RegisterBusinessScreen() {
     const [name, setName] = useState('');
@@ -11,7 +12,6 @@ export default function RegisterBusinessScreen() {
     const [longitude, setLongitude] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
 
-    // Categorías predefinidas
     const categories = [
         'Restaurante', 'Tienda', 'Cafetería', 'Supermercado', 'Mercado',
         'Frutería', 'Ferretería', 'Farmacia', 'Librería', 'Ropa',
@@ -47,6 +47,23 @@ export default function RegisterBusinessScreen() {
         }
     };
 
+    const handleUseCurrentLocation = async () => {
+        try {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                alert('Permiso para acceder a la ubicación fue denegado');
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({});
+            setLatitude(location.coords.latitude.toString());
+            setLongitude(location.coords.longitude.toString());
+        } catch (error) {
+            alert('Error al obtener la ubicación');
+            console.log(error);
+        }
+    };
+
     return (
         <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
             <ScrollView contentContainerStyle={styles.container}>
@@ -62,13 +79,11 @@ export default function RegisterBusinessScreen() {
                     />
                 </View>
 
-                {/* Campo de categoría */}
                 <TouchableOpacity style={styles.inputContainer} onPress={() => setModalVisible(true)}>
                     <Ionicons name="pricetag" size={20} color="#666" style={styles.icon} />
                     <Text style={styles.input}>{category || 'Selecciona una categoría'}</Text>
                 </TouchableOpacity>
 
-                {/* Modal para seleccionar categoría */}
                 <Modal
                     visible={modalVisible}
                     animationType="slide"
@@ -124,6 +139,11 @@ export default function RegisterBusinessScreen() {
                     />
                 </View>
 
+                {/* NUEVO: Botón para usar ubicación actual */}
+                <TouchableOpacity style={styles.locationButton} onPress={handleUseCurrentLocation}>
+                    <Text style={styles.locationButtonText}>📍 Usar mi ubicación actual</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity style={styles.button} onPress={handleRegister}>
                     <Text style={styles.buttonText}>📌 Registrar</Text>
                 </TouchableOpacity>
@@ -170,7 +190,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo semi-transparente
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
         width: 300,
@@ -214,5 +234,21 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
+    },
+    locationButton: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 12,
+        borderRadius: 12,
+        alignItems: 'center',
+        marginTop: 12,
+        shadowColor: '#4CAF50',
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    locationButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });
