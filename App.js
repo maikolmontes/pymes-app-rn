@@ -1,14 +1,15 @@
-
-import { StyleSheet } from 'react-native';
+// App.js
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import StackNavigator from './navigation/StackNavigator'; // Asegúrate de que este archivo exista
-
+import DrawerNavigator from './navigation/DrawerNavigator';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <DrawerNavigator />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
-
