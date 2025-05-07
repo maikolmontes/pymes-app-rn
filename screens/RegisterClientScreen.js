@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import * as Google from 'expo-auth-session/providers/google';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function LoginScreen() {
+export default function RegisterScreen() {
   const navigation = useNavigation();
+
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userType, setUserType] = useState('');
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: 'TU_CLIENT_ID_EXPO_GO',
-    androidClientId: 'TU_CLIENT_ID_ANDROID',
-    iosClientId: 'TU_CLIENT_ID_IOS',
   });
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Campos requeridos', 'Por favor completa los campos');
+  const handleRegister = () => {
+    if (!name || !email || !password || !userType) {
+      Alert.alert('Campos requeridos', 'Por favor completa todos los campos.');
       return;
     }
-    Alert.alert('Iniciando sesión', `Correo: ${email}`);
+    Alert.alert('Registro exitoso', `Bienvenido ${name} (${userType})`);
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleRegister = () => {
     promptAsync();
   };
 
@@ -34,8 +36,7 @@ export default function LoginScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.loginTitle}>Login</Text>
-        {/* Puedes agregar aquí círculos SVG o decoraciones si deseas */}
+        <Text style={styles.title}>Register</Text>
       </View>
 
       {/* Parte inferior */}
@@ -44,38 +45,46 @@ export default function LoginScreen() {
 
         <TextInput
           style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
+          placeholder="Nombre completo"
+          value={name}
+          onChangeText={setName}
         />
-
         <TextInput
           style={styles.input}
-          placeholder="Password"
+          placeholder="Correo electrónico"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Contraseña"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
         />
 
-        <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot password?</Text>
+        <Text style={styles.label}>Tipo de usuario</Text>
+        <Picker
+          selectedValue={userType}
+          onValueChange={(itemValue) => setUserType(itemValue)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Selecciona una opción..." value="" />
+          <Picker.Item label="Emprendedor" value="emprendedor" />
+          <Picker.Item label="Cliente" value="cliente" />
+        </Picker>
+
+        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
+          <Text style={styles.buttonText}>📝 Registrarse</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Sign in</Text>
-        </TouchableOpacity>
+        <Text style={styles.separator}>O continuar con</Text>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.signupText}>Sign up!</Text>
-        </TouchableOpacity>
-
-        <Text style={styles.orText}>Or</Text>
-
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleRegister}>
           <Image source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }} style={styles.googleIcon} />
-          <Text style={styles.googleText}>Sign in with Google</Text>
+          <Text style={styles.googleText}>Registrarse con Google</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -96,7 +105,7 @@ const styles = StyleSheet.create({
     top: 50,
     left: 20,
   },
-  loginTitle: {
+  title: {
     color: '#fff',
     fontSize: 32,
     fontWeight: 'bold',
@@ -116,44 +125,42 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     backgroundColor: '#f0f0f0',
-    padding: 12,
+    padding: 14,
     borderRadius: 10,
     marginBottom: 12,
+    borderColor: '#ccc',
+    borderWidth: 1,
   },
-  forgot: {
-    alignSelf: 'flex-end',
-    marginBottom: 16,
-    color: '#007bff',
+  label: {
+    alignSelf: 'flex-start',
+    marginBottom: 5,
+    marginTop: 10,
+    fontWeight: 'bold',
   },
-  loginButton: {
-    backgroundColor: '#0A0E21',
+  picker: {
+    width: '100%',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginBottom: 20,
+  },
+  registerButton: {
+    backgroundColor: '#2E86DE',
     width: '100%',
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  signupText: {
-    color: '#000',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-    marginBottom: 10,
-  },
-  orText: {
+  separator: {
     color: '#666',
     marginBottom: 10,
   },
   googleButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
     borderColor: '#ccc',
     borderWidth: 1,
-    padding: 10,
+    padding: 12,
     borderRadius: 10,
   },
   googleIcon: {
@@ -162,6 +169,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   googleText: {
+    fontWeight: 'bold',
+  },
+  buttonText: {
+    color: '#fff',
     fontWeight: 'bold',
   },
 });
