@@ -1,6 +1,16 @@
 import React from 'react';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
-import { Image, View, Text, StyleSheet } from 'react-native';
+import {
+    createDrawerNavigator,
+    DrawerContentScrollView,
+    DrawerItemList,
+} from '@react-navigation/drawer';
+import {
+    Image,
+    View,
+    Text,
+    StyleSheet,
+} from 'react-native';
+
 import HomeScreen from '../screens/HomeScreen';
 import RegisterBusinessScreen from '../screens/RegisterBusinessScreen';
 import MapScreen from '../screens/MapScreen';
@@ -35,11 +45,51 @@ export default function DrawerNavigator() {
             }}
         >
             <Drawer.Screen name="Inicio" component={HomeScreen} />
-            <Drawer.Screen name="Mapa" component={MapScreen} />
-            <Drawer.Screen name="Negocios" component={RegisterBusinessScreen} />
-            <Drawer.Screen name="Login" component={LoginScreen} />
-            <Drawer.Screen name="Nosotros" component={AboutScreen} />
-            <Drawer.Screen name="Contacto" component={ContactScreen} />
+            <Drawer.Screen
+                name="Mapa"
+                component={MapScreen}
+                options={{
+                    drawerIcon: () => (
+                        <Image source={require('../assets/logo2.png')} style={styles.icon} />
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Negocios"
+                component={RegisterBusinessScreen}
+                options={{
+                    drawerIcon: () => (
+                        <Image source={require('../assets/logo3.png')} style={styles.icon} />
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{
+                    drawerIcon: () => (
+                        <Image source={require('../assets/logo1.png')} style={styles.icon} />
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Nosotros"
+                component={AboutScreen}
+                options={{
+                    drawerIcon: () => (
+                        <Image source={require('../assets/logo4.png')} style={styles.icon} />
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Contacto"
+                component={ContactScreen}
+                options={{
+                    drawerIcon: () => (
+                        <Image source={require('../assets/logo5.png')} style={styles.icon} />
+                    ),
+                }}
+            />
         </Drawer.Navigator>
     );
 }
@@ -57,5 +107,10 @@ const styles = StyleSheet.create({
     logoText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    icon: {
+        width: 20,
+        height: 20,
+        marginRight: 10,
     },
 });
