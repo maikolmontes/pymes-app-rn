@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  ActivityIndicator,
-  Dimensions,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-const { width } = Dimensions.get('window');
+import { db } from '../firebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 const categoryIcons = {
-  Restaurante: 'restaurant',
-  Tienda: 'cart',
-  Cafetería: 'cafe',
-  Supermercado: 'basket',
-  Mercado: 'storefront',
-  Frutería: 'leaf',
-  Ferretería: 'hammer',
-  Farmacia: 'medkit',
-  Librería: 'book',
-  Ropa: 'shirt',
-  Zapatería: 'walk',
-  Juguetería: 'game-controller',
-  Papelería: 'document',
-  Barbería: 'cut',
-  Estética: 'color-palette',
+  'Restaurante': 'restaurant',
+  'Tienda': 'cart',
+  'Cafetería': 'cafe',
+  'Supermercado': 'basket',
+  'Mercado': 'storefront',
+  'Frutería': 'leaf',
+  'Ferretería': 'hammer',
+  'Farmacia': 'medkit',
+  'Librería': 'book',
+  'Ropa': 'shirt',
+  'Zapatería': 'walk',
+  'Juguetería': 'game-controller',
+  'Papelería': 'document',
+  'Barbería': 'cut',
+  'Estética': 'color-palette',
 };
 
 export default function BusinessListScreen() {
@@ -37,10 +28,15 @@ export default function BusinessListScreen() {
 
   useEffect(() => {
     const loadBusinesses = async () => {
-      const stored = await AsyncStorage.getItem('negocios');
-      const parsed = stored ? JSON.parse(stored) : [];
-      setBusinesses(parsed);
-      setLoading(false);
+      try {
+        const snapshot = await getDocs(collection(db, 'negocios'));
+        const data = snapshot.docs.map(doc => doc.data());
+        setBusinesses(data);
+      } catch (error) {
+        console.log('Error al cargar negocios:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     loadBusinesses();
   }, []);
@@ -49,7 +45,7 @@ export default function BusinessListScreen() {
     <View style={styles.card}>
       <Ionicons
         name={categoryIcons[item.category] || 'business'}
-        size={width * 0.08}
+        size={32}
         color="#2196F3"
         style={styles.icon}
       />
@@ -65,37 +61,32 @@ export default function BusinessListScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <View style={styles.center}>
         <ActivityIndicator size="large" color="#2196F3" />
         <Text>Cargando negocios...</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <FlatList
-        data={businesses}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
-      />
-    </SafeAreaView>
+    <FlatList
+      data={businesses}
+      keyExtractor={(_, index) => index.toString()}
+      renderItem={renderItem}
+      contentContainerStyle={styles.list}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: '#f4f6f8',
-  },
   list: {
     padding: 16,
+    backgroundColor: '#f4f6f8',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: width * 0.04,
+    padding: 16,
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -105,23 +96,23 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   icon: {
-    marginRight: width * 0.04,
+    marginRight: 16,
   },
   info: {
     flex: 1,
   },
   name: {
-    fontSize: width * 0.045,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
   category: {
-    fontSize: width * 0.038,
+    fontSize: 14,
     color: '#777',
     marginTop: 4,
   },
   coordinates: {
-    fontSize: width * 0.035,
+    fontSize: 12,
     color: '#aaa',
     marginTop: 2,
   },

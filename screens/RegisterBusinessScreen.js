@@ -10,13 +10,12 @@ import {
   Platform,
   Modal,
   FlatList,
-  Dimensions,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
-
-const { width } = Dimensions.get('window');
+import { db } from '../firebaseConfig';
+import { collection, addDoc } from 'firebase/firestore';
 
 export default function RegisterBusinessScreen() {
   const [name, setName] = useState('');
@@ -43,20 +42,19 @@ export default function RegisterBusinessScreen() {
         category,
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
+        createdAt: new Date(),
       };
 
-      const existing = JSON.parse(await AsyncStorage.getItem('negocios')) || [];
-      existing.push(newBusiness);
-      await AsyncStorage.setItem('negocios', JSON.stringify(existing));
+      await addDoc(collection(db, 'negocios'), newBusiness);
 
-      alert('Negocio registrado con coordenadas');
+      alert('Negocio registrado correctamente');
       setName('');
       setCategory('');
       setLatitude('');
       setLongitude('');
     } catch (error) {
-      console.log(error);
-      alert('Error al guardar el negocio');
+      console.error('Error al guardar en Firestore:', error);
+      alert('Hubo un error al guardar el negocio');
     }
   };
 
@@ -78,11 +76,13 @@ export default function RegisterBusinessScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Registrar Negocio</Text>
 
-        {/* Nombre */}
         <View style={styles.inputContainer}>
           <Ionicons name="business" size={20} color="#666" style={styles.icon} />
           <TextInput
@@ -93,13 +93,17 @@ export default function RegisterBusinessScreen() {
           />
         </View>
 
-        {/* Categoría */}
         <TouchableOpacity style={styles.inputContainer} onPress={() => setModalVisible(true)}>
           <Ionicons name="pricetag" size={20} color="#666" style={styles.icon} />
           <Text style={styles.input}>{category || 'Selecciona una categoría'}</Text>
         </TouchableOpacity>
 
-        <Modal visible={modalVisible} transparent animationType="slide">
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setModalVisible(false)}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <FlatList
@@ -124,7 +128,6 @@ export default function RegisterBusinessScreen() {
           </View>
         </Modal>
 
-        {/* Latitud */}
         <View style={styles.inputContainer}>
           <Ionicons name="locate" size={20} color="#666" style={styles.icon} />
           <TextInput
@@ -136,7 +139,6 @@ export default function RegisterBusinessScreen() {
           />
         </View>
 
-        {/* Longitud */}
         <View style={styles.inputContainer}>
           <Ionicons name="locate" size={20} color="#666" style={styles.icon} />
           <TextInput
@@ -148,7 +150,6 @@ export default function RegisterBusinessScreen() {
           />
         </View>
 
-        {/* Botones */}
         <TouchableOpacity style={styles.locationButton} onPress={handleUseCurrentLocation}>
           <Text style={styles.locationButtonText}>📍 Usar mi ubicación actual</Text>
         </TouchableOpacity>
@@ -163,14 +164,14 @@ export default function RegisterBusinessScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: width * 0.06,
-    paddingTop: 50,
+    padding: 24,
+    paddingTop: 60,
     backgroundColor: '#f4f6f8',
   },
   title: {
-    fontSize: width * 0.07,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 24,
     textAlign: 'center',
     color: '#333',
   },
@@ -182,6 +183,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
     elevation: 2,
   },
   icon: {
@@ -189,23 +193,24 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: width * 0.04,
+    fontSize: 16,
     color: '#333',
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '85%',
+    width: 300,
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 12,
-    alignSelf: 'center',
   },
   categoryItem: {
     paddingVertical: 10,
+    paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderColor: '#ddd',
   },
@@ -230,6 +235,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 24,
+    shadowColor: '#2196F3',
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 3,
   },
   buttonText: {
     color: '#fff',
@@ -242,6 +251,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     marginTop: 12,
+    shadowColor: '#4CAF50',
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   locationButtonText: {
     color: '#fff',
