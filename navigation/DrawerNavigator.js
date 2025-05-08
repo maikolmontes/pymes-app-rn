@@ -47,6 +47,24 @@ export default function DrawerNavigator() {
         >
             <Drawer.Screen name="Inicio" component={HomeScreen} />
             <Drawer.Screen
+                name="Iniciar Sesion"
+                component={LoginScreen}
+                options={{
+                    drawerIcon: () => (
+                        <Image source={require('../assets/logo1.png')} style={styles.icon} />
+                    ),
+                }}
+            />
+            
+            <Drawer.Screen
+                name="Register"
+                component={RegisterClientScreen}
+                options={{ title: 'Registrarse' }}
+            />
+
+           
+
+            <Drawer.Screen
                 name="Mapa"
                 component={MapScreen}
                 options={{
@@ -64,15 +82,7 @@ export default function DrawerNavigator() {
                     ),
                 }}
             />
-            <Drawer.Screen
-                name="Iniciar Sesion"
-                component={LoginScreen}
-                options={{
-                    drawerIcon: () => (
-                        <Image source={require('../assets/logo1.png')} style={styles.icon} />
-                    ),
-                }}
-            />
+            
             <Drawer.Screen
                 name="Nosotros"
                 component={AboutScreen}
@@ -91,11 +101,7 @@ export default function DrawerNavigator() {
                     ),
                 }}
             />
-            <Drawer.Screen
-                name="Register"
-                component={RegisterClientScreen}
-                options={{ title: 'Registrarse' }}
-            />
+            
         </Drawer.Navigator>
     );
 }
