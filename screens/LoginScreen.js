@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Google from 'expo-auth-session/providers/google';
 import { Ionicons } from '@expo/vector-icons';
+
+const { width } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const navigation = useNavigation();
@@ -28,88 +41,96 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Parte superior */}
-      <View style={styles.topSection}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.loginTitle}>Login</Text>
-        {/* Puedes agregar aquí círculos SVG o decoraciones si deseas */}
-      </View>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Parte superior */}
+        <View style={styles.topSection}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={width * 0.06} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.loginTitle}>Login</Text>
+        </View>
 
-      {/* Parte inferior */}
-      <View style={styles.bottomSection}>
-        <Image source={require('../assets/logo.png')} style={styles.logo} />
+        {/* Parte inferior */}
+        <View style={styles.bottomSection}>
+          <Image source={require('../assets/logo.png')} style={styles.logo} />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-        <TouchableOpacity>
-          <Text style={styles.forgot}>Forgot password?</Text>
-        </TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={styles.forgot}>¿Olvidaste tu contraseña?</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Sign in</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.buttonText}>Iniciar sesión</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.signupText}>Sign up!</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+            <Text style={styles.signupText}>¿No tienes cuenta? Regístrate</Text>
+          </TouchableOpacity>
 
-        <Text style={styles.orText}>Or</Text>
+          <Text style={styles.orText}>O</Text>
 
-        <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
-          <Image source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }} style={styles.googleIcon} />
-          <Text style={styles.googleText}>Sign in with Google</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleLogin}>
+            <Image
+              source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
+              style={styles.googleIcon}
+            />
+            <Text style={styles.googleText}>Iniciar sesión con Google</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  topSection: {
+  safe: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  container: {
+    flexGrow: 1,
+  },
+  topSection: {
     backgroundColor: '#0A0E21',
-    justifyContent: 'center',
+    paddingVertical: width * 0.2,
     alignItems: 'center',
     position: 'relative',
   },
   backButton: {
     position: 'absolute',
-    top: 50,
+    top: 40,
     left: 20,
   },
   loginTitle: {
     color: '#fff',
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: 'bold',
   },
   bottomSection: {
-    flex: 2,
     backgroundColor: '#fff',
     alignItems: 'center',
     padding: 24,
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: width * 0.25,
+    height: width * 0.25,
     resizeMode: 'contain',
     marginBottom: 24,
   },
@@ -119,11 +140,13 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,
+    fontSize: width * 0.04,
   },
   forgot: {
     alignSelf: 'flex-end',
     marginBottom: 16,
     color: '#007bff',
+    fontSize: width * 0.035,
   },
   loginButton: {
     backgroundColor: '#0A0E21',
@@ -136,16 +159,19 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: width * 0.045,
   },
   signupText: {
     color: '#000',
     fontWeight: 'bold',
     textDecorationLine: 'underline',
+    fontSize: width * 0.04,
     marginBottom: 10,
   },
   orText: {
     color: '#666',
     marginBottom: 10,
+    fontSize: width * 0.04,
   },
   googleButton: {
     flexDirection: 'row',
@@ -163,5 +189,6 @@ const styles = StyleSheet.create({
   },
   googleText: {
     fontWeight: 'bold',
+    fontSize: width * 0.04,
   },
 });

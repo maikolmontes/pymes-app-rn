@@ -1,4 +1,3 @@
-// screens/MapScreen.js
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -10,10 +9,14 @@ import {
   Modal,
   TextInput,
   FlatList,
+  Dimensions,
+  Platform,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const { width, height } = Dimensions.get('window');
 
 function getDistanceKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -38,21 +41,9 @@ export default function MapScreen({ navigation }) {
   const [showCategoryList, setShowCategoryList] = useState(false);
 
   const categories = [
-    'Restaurante',
-    'Tienda',
-    'Cafetería',
-    'Supermercado',
-    'Mercado',
-    'Frutería',
-    'Ferretería',
-    'Farmacia',
-    'Librería',
-    'Ropa',
-    'Zapatería',
-    'Juguetería',
-    'Papelería',
-    'Barbería',
-    'Estética',
+    'Restaurante', 'Tienda', 'Cafetería', 'Supermercado', 'Mercado',
+    'Frutería', 'Ferretería', 'Farmacia', 'Librería', 'Ropa',
+    'Zapatería', 'Juguetería', 'Papelería', 'Barbería', 'Estética',
   ];
 
   useEffect(() => {
@@ -84,8 +75,7 @@ export default function MapScreen({ navigation }) {
     const isCategoryMatch = !selectedCategory || n.category === selectedCategory;
     const isInRadius =
       !radiusKm ||
-      getDistanceKm(location.latitude, location.longitude, n.latitude, n.longitude) <=
-        parseFloat(radiusKm);
+      getDistanceKm(location.latitude, location.longitude, n.latitude, n.longitude) <= parseFloat(radiusKm);
     return isCategoryMatch && isInRadius;
   });
 
@@ -100,23 +90,14 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Botón Filtro */}
-      <TouchableOpacity
-        style={styles.filterButton}
-        onPress={() => setIsFilterModalVisible(true)}
-      >
+      <TouchableOpacity style={styles.filterButton} onPress={() => setIsFilterModalVisible(true)}>
         <Text style={styles.filterButtonText}>Filtrar</Text>
       </TouchableOpacity>
 
-      {/* Botón Volver al inicio */}
-      <TouchableOpacity
-        style={styles.homeButton}
-        onPress={() => navigation.navigate('Inicio')}
-      >
+      <TouchableOpacity style={styles.homeButton} onPress={() => navigation.navigate('Inicio')}>
         <Text style={styles.homeButtonText}>🏠 Inicio</Text>
       </TouchableOpacity>
 
-      {/* Mapa */}
       <MapView
         style={styles.map}
         initialRegion={{
@@ -128,7 +109,6 @@ export default function MapScreen({ navigation }) {
         showsUserLocation={false}
         followUserLocation={true}
       >
-        {/* Marcador personalizado para tu ubicación */}
         <Marker
           coordinate={{
             latitude: location.latitude,
@@ -138,7 +118,6 @@ export default function MapScreen({ navigation }) {
           description="Mi ubicación actual"
           pinColor="blue"
         />
-
         {negociosFiltrados.map((negocio, index) => (
           <Marker
             key={index}
@@ -149,21 +128,16 @@ export default function MapScreen({ navigation }) {
         ))}
       </MapView>
 
-      {/* Modal Filtros */}
       <Modal visible={isFilterModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Filtrar negocios</Text>
 
             <Text style={styles.modalSubtitle}>Categoría:</Text>
-            <TouchableOpacity
-              style={styles.selectorButton}
-              onPress={() => setShowCategoryList(true)}
-            >
+            <TouchableOpacity style={styles.selectorButton} onPress={() => setShowCategoryList(true)}>
               <Text>{selectedCategory || 'Selecciona una categoría'}</Text>
             </TouchableOpacity>
 
-            {/* Lista de categorías */}
             <Modal visible={showCategoryList} transparent animationType="fade">
               <View style={styles.modalOverlay}>
                 <View style={styles.categoryListModal}>
@@ -182,20 +156,16 @@ export default function MapScreen({ navigation }) {
                       </TouchableOpacity>
                     )}
                   />
-                  <TouchableOpacity
-                    style={styles.clearButton}
-                    onPress={() => {
-                      setSelectedCategory(null);
-                      setShowCategoryList(false);
-                    }}
-                  >
+                  <TouchableOpacity style={styles.clearButton} onPress={() => {
+                    setSelectedCategory(null);
+                    setShowCategoryList(false);
+                  }}>
                     <Text style={{ color: 'red' }}>Limpiar categoría</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </Modal>
 
-            {/* Radio */}
             <Text style={styles.modalSubtitle}>Radio (km):</Text>
             <TextInput
               placeholder="Ej. 2"
@@ -206,14 +176,11 @@ export default function MapScreen({ navigation }) {
               maxLength={4}
             />
 
-            <TouchableOpacity
-              style={styles.clearButton}
-              onPress={() => {
-                setSelectedCategory(null);
-                setRadiusKm('');
-                setIsFilterModalVisible(false);
-              }}
-            >
+            <TouchableOpacity style={styles.clearButton} onPress={() => {
+              setSelectedCategory(null);
+              setRadiusKm('');
+              setIsFilterModalVisible(false);
+            }}>
               <Text style={{ color: 'red' }}>Mostrar todos</Text>
             </TouchableOpacity>
 
@@ -236,44 +203,54 @@ export default function MapScreen({ navigation }) {
   );
 }
 
-// Estilos
+// Estilos adaptados
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+
   filterButton: {
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: Platform.OS === 'ios' ? height * 0.05 : height * 0.04,
+    left: width * 0.05,
     zIndex: 2,
     backgroundColor: '#2196F3',
-    padding: 10,
+    padding: width * 0.025,
     borderRadius: 8,
   },
   filterButtonText: { color: 'white', fontWeight: 'bold' },
+
   homeButton: {
     position: 'absolute',
-    top: 40,
-    right: 20,
+    top: Platform.OS === 'ios' ? height * 0.05 : height * 0.04,
+    right: width * 0.05,
     zIndex: 2,
     backgroundColor: '#00b894',
-    padding: 10,
+    padding: width * 0.025,
     borderRadius: 8,
   },
   homeButtonText: { color: 'white', fontWeight: 'bold' },
+
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalContainer: {
-    margin: 20,
+    margin: width * 0.05,
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: 20,
+    padding: width * 0.05,
   },
-  modalTitle: { fontWeight: 'bold', fontSize: 18, marginBottom: 10 },
-  modalSubtitle: { marginTop: 15, fontWeight: 'bold' },
+  modalTitle: {
+    fontWeight: 'bold',
+    fontSize: width * 0.045,
+    marginBottom: 10,
+  },
+  modalSubtitle: {
+    marginTop: 15,
+    fontWeight: 'bold',
+  },
   selectorButton: {
     padding: 10,
     borderWidth: 1,
@@ -284,7 +261,7 @@ const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 8,
+    padding: 10,
     marginTop: 5,
     borderRadius: 6,
   },
@@ -293,7 +270,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryButton: {
-    padding: 10,
+    padding: 12,
     alignItems: 'center',
     marginTop: 10,
     borderRadius: 6,

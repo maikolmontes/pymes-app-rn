@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, ScrollView } from 'react-native';
+import {
+  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,
+  Image, ScrollView, Dimensions, Platform
+} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import * as Google from 'expo-auth-session/providers/google';
 import { Ionicons } from '@expo/vector-icons';
+
+const { width, height } = Dimensions.get('window');
 
 export default function RegisterClientScreen() {
   const navigation = useNavigation();
@@ -68,15 +73,17 @@ export default function RegisterClientScreen() {
         />
 
         <Text style={styles.label}>Tipo de usuario</Text>
-        <Picker
-          selectedValue={userType}
-          onValueChange={(itemValue) => setUserType(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Selecciona una opción..." value="" />
-          <Picker.Item label="Emprendedor" value="emprendedor" />
-          <Picker.Item label="Cliente" value="cliente" />
-        </Picker>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={userType}
+            onValueChange={(itemValue) => setUserType(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecciona una opción..." value="" />
+            <Picker.Item label="Emprendedor" value="emprendedor" />
+            <Picker.Item label="Cliente" value="cliente" />
+          </Picker>
+        </View>
 
         <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
           <Text style={styles.buttonText}>📝 Registrarse</Text>
@@ -85,7 +92,10 @@ export default function RegisterClientScreen() {
         <Text style={styles.separator}>O continuar con</Text>
 
         <TouchableOpacity style={styles.googleButton} onPress={handleGoogleRegister}>
-          <Image source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }} style={styles.googleIcon} />
+          <Image
+            source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
+            style={styles.googleIcon}
+          />
           <Text style={styles.googleText}>Registrarse con Google</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -96,7 +106,7 @@ export default function RegisterClientScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   topSection: {
-    height: 180,
+    height: height * 0.22,
     backgroundColor: '#0A0E21',
     justifyContent: 'center',
     alignItems: 'center',
@@ -104,23 +114,23 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    top: 50,
+    top: Platform.OS === 'ios' ? 60 : 40,
     left: 20,
   },
   title: {
     color: '#fff',
-    fontSize: 32,
+    fontSize: width * 0.08,
     fontWeight: 'bold',
   },
   bottomSection: {
-    padding: 24,
+    padding: width * 0.06,
     paddingBottom: 80,
     backgroundColor: '#fff',
     alignItems: 'center',
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: width * 0.2,
+    height: width * 0.2,
     resizeMode: 'contain',
     marginBottom: 24,
   },
@@ -139,11 +149,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
   },
-  picker: {
+  pickerContainer: {
     width: '100%',
     backgroundColor: '#f0f0f0',
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
     marginBottom: 20,
+  },
+  picker: {
+    width: '100%',
+    height: 50,
   },
   registerButton: {
     backgroundColor: '#2E86DE',
@@ -152,6 +168,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 20,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   separator: {
     color: '#666',
@@ -171,10 +191,6 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   googleText: {
-    fontWeight: 'bold',
-  },
-  buttonText: {
-    color: '#fff',
     fontWeight: 'bold',
   },
 });
