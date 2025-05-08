@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, Alert,
-  Image, ScrollView, Dimensions, Platform
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  Image,
+  ScrollView,
+  Dimensions,
+  Platform,
+  Modal,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import * as Google from 'expo-auth-session/providers/google';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +25,12 @@ export default function RegisterClientScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('');
+  const [document, setDocument] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const userTypes = ['Emprendedor', 'Cliente'];
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: 'TU_CLIENT_ID_EXPO_GO',
@@ -25,11 +39,14 @@ export default function RegisterClientScreen() {
   });
 
   const handleRegister = () => {
-    if (!name || !email || !password || !userType) {
+    if (!name || !email || !password || !userType || !document || !phone || !address) {
       Alert.alert('Campos requeridos', 'Por favor completa todos los campos.');
       return;
     }
-    Alert.alert('Registro exitoso', `Bienvenido ${name} (${userType})`);
+    Alert.alert(
+      'Registro exitoso',
+      `Bienvenido ${name} (${userType})\nDocumento: ${document}\nTeléfono: ${phone}`
+    );
   };
 
   const handleGoogleRegister = () => {
@@ -71,19 +88,58 @@ export default function RegisterClientScreen() {
           onChangeText={setPassword}
           secureTextEntry
         />
+        <TextInput
+          style={styles.input}
+          placeholder="Número de documento"
+          value={document}
+          onChangeText={setDocument}
+          keyboardType="numeric"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Teléfono"
+          value={phone}
+          onChangeText={setPhone}
+          keyboardType="phone-pad"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Dirección"
+          value={address}
+          onChangeText={setAddress}
+        />
 
+        {/* Campo tipo de usuario con modal */}
         <Text style={styles.label}>Tipo de usuario</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={userType}
-            onValueChange={(itemValue) => setUserType(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Selecciona una opción..." value="" />
-            <Picker.Item label="Emprendedor" value="emprendedor" />
-            <Picker.Item label="Cliente" value="cliente" />
-          </Picker>
-        </View>
+        <TouchableOpacity style={styles.input} onPress={() => setModalVisible(true)}>
+          <Text style={{ color: userType ? '#000' : '#888' }}>
+            {userType || 'Selecciona una opción...'}
+          </Text>
+        </TouchableOpacity>
+
+        <Modal visible={modalVisible} animationType="slide" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <ScrollView>
+                {userTypes.map((type, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.modalItem}
+                    onPress={() => {
+                      setUserType(type);
+                      setModalVisible(false);
+                    }}
+                  >
+                    <Text style={styles.modalText}>{type}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <TouchableOpacity style={styles.modalClose} onPress={() => setModalVisible(false)}>
+                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
 
         <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
           <Text style={styles.buttonText}>📝 Registrarse</Text>
@@ -149,18 +205,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
   },
-  pickerContainer: {
-    width: '100%',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 20,
-  },
-  picker: {
-    width: '100%',
-    height: 50,
-  },
   registerButton: {
     backgroundColor: '#2E86DE',
     width: '100%',
@@ -192,5 +236,34 @@ const styles = StyleSheet.create({
   },
   googleText: {
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    maxHeight: 400,
+  },
+  modalItem: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  modalClose: {
+    marginTop: 20,
+    backgroundColor: '#2E86DE',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 });
