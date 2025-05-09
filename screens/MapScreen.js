@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-  FlatList,
-  Dimensions,
-  Platform,
+  View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity,
+  Modal, TextInput, FlatList, Dimensions, Platform
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { collection, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebaseConfig'; // Asegúrate de tener este archivo configurado
 
 const { width, height } = Dimensions.get('window');
 
@@ -25,8 +17,8 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -60,10 +52,23 @@ export default function MapScreen({ navigation }) {
       setLoading(false);
     })();
 
-    (async () => {
-      const storedNegocios = JSON.parse(await AsyncStorage.getItem('negocios')) || [];
-      setNegocios(storedNegocios);
-    })();
+    // Escuchar en tiempo real los negocios desde Firestore
+    const unsubscribe = onSnapshot(collection(db, 'negocios'), (snapshot) => {
+      const negociosFirebase = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name || '',
+          category: data.category || '',
+          latitude: parseFloat(data.latitude),
+          longitude: parseFloat(data.longitude),
+        };
+      }).filter(n => !isNaN(n.latitude) && !isNaN(n.longitude)); // evitar errores por coordenadas
+
+      setNegocios(negociosFirebase);
+    });
+
+    return () => unsubscribe(); // limpiar el listener
   }, []);
 
   const handleRadiusChange = (text) => {
@@ -106,21 +111,18 @@ export default function MapScreen({ navigation }) {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
-        showsUserLocation={false}
+        showsUserLocation={true}
         followUserLocation={true}
       >
         <Marker
-          coordinate={{
-            latitude: location.latitude,
-            longitude: location.longitude,
-          }}
+          coordinate={{ latitude: location.latitude, longitude: location.longitude }}
           title="Estás aquí"
           description="Mi ubicación actual"
           pinColor="blue"
         />
-        {negociosFiltrados.map((negocio, index) => (
+        {negociosFiltrados.map(negocio => (
           <Marker
-            key={index}
+            key={negocio.id}
             coordinate={{ latitude: negocio.latitude, longitude: negocio.longitude }}
             title={negocio.name}
             description={negocio.category}
@@ -128,6 +130,7 @@ export default function MapScreen({ navigation }) {
         ))}
       </MapView>
 
+      {/* Modal Filtros */}
       <Modal visible={isFilterModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -203,12 +206,11 @@ export default function MapScreen({ navigation }) {
   );
 }
 
-// Estilos adaptados
+// Estilos
 const styles = StyleSheet.create({
   container: { flex: 1 },
   map: { flex: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-
   filterButton: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? height * 0.05 : height * 0.04,
@@ -219,7 +221,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   filterButtonText: { color: 'white', fontWeight: 'bold' },
-
   homeButton: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? height * 0.05 : height * 0.04,
@@ -230,7 +231,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   homeButtonText: { color: 'white', fontWeight: 'bold' },
-
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
