@@ -20,6 +20,7 @@ import LoginScreen from '../screens/LoginScreen';
 import AboutScreen from '../screens/AboutScreen';
 import ContactScreen from '../screens/ContactScreen';
 import RegisterClientScreen from '../screens/RegisterClientScreen';
+import BusinessListScreen from '../screens/BusinessListScreen';
 
 const { width } = Dimensions.get('window');
 const Drawer = createDrawerNavigator();
@@ -79,8 +80,17 @@ export default function DrawerNavigator() {
           ),
         }}
       />
+       <Drawer.Screen
+        name="Lista Negocios"
+        component={BusinessListScreen}
+        options={{
+          drawerIcon: () => (
+            <Image source={require('../assets/logo3.png')} style={styles.icon} />
+          ),
+        }}
+      />
       <Drawer.Screen
-        name="Negocios"
+        name="Registro Negocios"
         component={RegisterBusinessScreen}
         options={{
           drawerIcon: () => (
