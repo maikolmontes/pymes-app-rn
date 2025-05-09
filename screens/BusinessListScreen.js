@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { db } from '../firebaseConfig';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 const categoryIcons = {
   'Restaurante': 'restaurant',
@@ -27,18 +27,25 @@ export default function BusinessListScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadBusinesses = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'negocios'));
-        const data = snapshot.docs.map(doc => doc.data());
-        setBusinesses(data);
-      } catch (error) {
-        console.log('Error al cargar negocios:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadBusinesses();
+    const unsubscribe = onSnapshot(collection(db, 'negocios'), (snapshot) => {
+      const businessData = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name || '',
+          category: data.category || '',
+          latitude: parseFloat(data.latitude),
+          longitude: parseFloat(data.longitude),
+        };
+      }).filter(b => !isNaN(b.latitude) && !isNaN(b.longitude)); // Validación de coordenadas
+      setBusinesses(businessData);
+      setLoading(false);
+    }, (error) => {
+      console.log('Error al cargar negocios:', error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // limpieza
   }, []);
 
   const renderItem = ({ item }) => (
@@ -71,7 +78,7 @@ export default function BusinessListScreen() {
   return (
     <FlatList
       data={businesses}
-      keyExtractor={(_, index) => index.toString()}
+      keyExtractor={item => item.id}
       renderItem={renderItem}
       contentContainerStyle={styles.list}
     />
