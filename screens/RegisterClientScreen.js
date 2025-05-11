@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import * as Google from 'expo-auth-session/providers/google';
-
-
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterClientScreen() {
@@ -44,7 +42,7 @@ export default function RegisterClientScreen() {
       </View>
 
       {/* Parte inferior */}
-      <View style={styles.bottomSection}>
+      <ScrollView contentContainerStyle={styles.bottomSection} showsVerticalScrollIndicator={false}>
         <Image source={require('../assets/logo.png')} style={styles.logo} />
 
         <TextInput
@@ -90,15 +88,15 @@ export default function RegisterClientScreen() {
           <Image source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }} style={styles.googleIcon} />
           <Text style={styles.googleText}>Registrarse con Google</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#fff' },
   topSection: {
-    flex: 1,
+    height: 180,
     backgroundColor: '#0A0E21',
     justifyContent: 'center',
     alignItems: 'center',
@@ -115,10 +113,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   bottomSection: {
-    flex: 2,
+    padding: 24,
+    paddingBottom: 80,
     backgroundColor: '#fff',
     alignItems: 'center',
-    padding: 24,
   },
   logo: {
     width: 80,
