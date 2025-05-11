@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import RegisterBusinessScreen from '../screens/RegisterBusinessScreen';
 import MapScreen from '../screens/MapScreen';
+import RegisterClientScreen from '../screens/RegisterClientScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,11 @@ export default function StackNavigator() {
                 name="Mapa"
                 component={MapScreen}
                 options={{ title: 'Negocios Cercanos' }}
+            />
+            <Stack.Screen
+                name="Register"
+                component={RegisterClientScreen}
+                options={{ title: 'Registro' }}
             />
         </Stack.Navigator>
     );

@@ -17,6 +17,7 @@ import MapScreen from '../screens/MapScreen';
 import LoginScreen from '../screens/LoginScreen';
 import AboutScreen from '../screens/AboutScreen';
 import ContactScreen from '../screens/ContactScreen';
+import RegisterClientScreen from '../screens/RegisterClientScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -64,7 +65,7 @@ export default function DrawerNavigator() {
                 }}
             />
             <Drawer.Screen
-                name="Login"
+                name="Iniciar Sesion"
                 component={LoginScreen}
                 options={{
                     drawerIcon: () => (
@@ -89,6 +90,11 @@ export default function DrawerNavigator() {
                         <Image source={require('../assets/logo5.png')} style={styles.icon} />
                     ),
                 }}
+            />
+            <Drawer.Screen
+                name="Register"
+                component={RegisterClientScreen}
+                options={{ title: 'Registrarse' }}
             />
         </Drawer.Navigator>
     );

@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import * as Google from 'expo-auth-session/providers/google';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function RegisterScreen() {
+export default function RegisterClientScreen() {
   const navigation = useNavigation();
 
   const [name, setName] = useState('');
@@ -15,6 +15,8 @@ export default function RegisterScreen() {
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     expoClientId: 'TU_CLIENT_ID_EXPO_GO',
+    androidClientId: 'TU_CLIENT_ID_ANDROID',
+    iosClientId: 'TU_CLIENT_ID_IOS',
   });
 
   const handleRegister = () => {
