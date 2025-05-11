@@ -25,7 +25,7 @@ function CustomDrawerContent(props) {
     return (
         <DrawerContentScrollView {...props}>
             <View style={styles.logoContainer}>
-                <Image source={require('../assets/logo.png')} style={styles.logo} />
+                <Image source={require('../assets/logoW.png')} style={styles.logo} />
                 <Text style={styles.logoText}>The Pymes Manager</Text>
             </View>
             <DrawerItemList {...props} />
