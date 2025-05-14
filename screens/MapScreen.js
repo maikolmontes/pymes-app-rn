@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity,
-  Modal, TextInput, FlatList, Dimensions, Platform
+  Modal, TextInput, FlatList, Dimensions, Platform, Animated
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { db } from '../firebaseConfig'; // Asegúrate de tener este archivo configurado
+import { db } from '../firebaseConfig';
 
 const { width, height } = Dimensions.get('window');
 
@@ -23,7 +23,7 @@ function getDistanceKm(lat1, lon1, lat2, lon2) {
   return R * c;
 }
 
-export default function MapScreen({ navigation }) {
+export default function MapScreen({ navigation, route }) {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [negocios, setNegocios] = useState([]);
@@ -31,6 +31,8 @@ export default function MapScreen({ navigation }) {
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [radiusKm, setRadiusKm] = useState('');
   const [showCategoryList, setShowCategoryList] = useState(false);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const mapRef = useRef(null);
 
   const categories = [
     'Restaurante', 'Tienda', 'Cafetería', 'Supermercado', 'Mercado',
@@ -50,9 +52,26 @@ export default function MapScreen({ navigation }) {
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location.coords);
       setLoading(false);
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }).start();
+
+      if (route.params?.negocioDestacado) {
+        const { latitude, longitude } = route.params.negocioDestacado;
+        setTimeout(() => {
+          mapRef?.current?.animateToRegion({
+            latitude,
+            longitude,
+            latitudeDelta: 0.005,
+            longitudeDelta: 0.005,
+          }, 1000);
+        }, 500);
+      }
     })();
 
-    // Escuchar en tiempo real los negocios desde Firestore
     const unsubscribe = onSnapshot(collection(db, 'negocios'), (snapshot) => {
       const negociosFirebase = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -63,12 +82,11 @@ export default function MapScreen({ navigation }) {
           latitude: parseFloat(data.latitude),
           longitude: parseFloat(data.longitude),
         };
-      }).filter(n => !isNaN(n.latitude) && !isNaN(n.longitude)); // evitar errores por coordenadas
-
+      }).filter(n => !isNaN(n.latitude) && !isNaN(n.longitude));
       setNegocios(negociosFirebase);
     });
 
-    return () => unsubscribe(); // limpiar el listener
+    return () => unsubscribe();
   }, []);
 
   const handleRadiusChange = (text) => {
@@ -95,6 +113,7 @@ export default function MapScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {/* Botones de navegación */}
       <TouchableOpacity style={styles.filterButton} onPress={() => setIsFilterModalVisible(true)}>
         <Text style={styles.filterButtonText}>Filtrar</Text>
       </TouchableOpacity>
@@ -103,34 +122,38 @@ export default function MapScreen({ navigation }) {
         <Text style={styles.homeButtonText}>🏠 Inicio</Text>
       </TouchableOpacity>
 
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: location.latitude,
-          longitude: location.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-        showsUserLocation={true}
-        followUserLocation={true}
-      >
-        <Marker
-          coordinate={{ latitude: location.latitude, longitude: location.longitude }}
-          title="Estás aquí"
-          description="Mi ubicación actual"
-          pinColor="blue"
-        />
-        {negociosFiltrados.map(negocio => (
+      {/* Mapa con animación */}
+      <Animated.View style={[styles.mapWrapper, { opacity: fadeAnim }]}>
+        <MapView
+          ref={mapRef}
+          style={StyleSheet.absoluteFillObject}
+          initialRegion={{
+            latitude: location.latitude,
+            longitude: location.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+          showsUserLocation={true}
+          followUserLocation={true}
+        >
           <Marker
-            key={negocio.id}
-            coordinate={{ latitude: negocio.latitude, longitude: negocio.longitude }}
-            title={negocio.name}
-            description={negocio.category}
+            coordinate={{ latitude: location.latitude, longitude: location.longitude }}
+            title="Estás aquí"
+            description="Mi ubicación actual"
+            pinColor="blue"
           />
-        ))}
-      </MapView>
+          {negociosFiltrados.map(negocio => (
+            <Marker
+              key={negocio.id}
+              coordinate={{ latitude: negocio.latitude, longitude: negocio.longitude }}
+              title={negocio.name}
+              description={negocio.category}
+            />
+          ))}
+        </MapView>
+      </Animated.View>
 
-      {/* Modal Filtros */}
+      {/* Modal de filtros */}
       <Modal visible={isFilterModalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
@@ -206,11 +229,17 @@ export default function MapScreen({ navigation }) {
   );
 }
 
-// Estilos
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  mapWrapper: {
+    flex: 1,
+    position: 'relative',
+  },
+  center: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   filterButton: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? height * 0.05 : height * 0.04,
@@ -220,7 +249,10 @@ const styles = StyleSheet.create({
     padding: width * 0.025,
     borderRadius: 8,
   },
-  filterButtonText: { color: 'white', fontWeight: 'bold' },
+  filterButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   homeButton: {
     position: 'absolute',
     top: Platform.OS === 'ios' ? height * 0.05 : height * 0.04,
@@ -230,7 +262,10 @@ const styles = StyleSheet.create({
     padding: width * 0.025,
     borderRadius: 8,
   },
-  homeButtonText: { color: 'white', fontWeight: 'bold' },
+  homeButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
